@@ -8,8 +8,8 @@ import (
 )
 
 type Client struct {
-	c *uhttp.Client
-	// s                *Sign
+	c                *uhttp.Client
+	s                *Sign
 	onTransportError OnTransportError
 }
 
@@ -44,8 +44,7 @@ func (o *Client) WithTransport(transport *http.Transport) *Client {
 func (o *Client) Copy() *Client {
 	r := new(Client)
 	r.c = o.c.Copy()
-	//TODO
-	// r.s = o.s
+	r.s = o.s
 	r.onTransportError = o.onTransportError
 	return r
 }
@@ -66,8 +65,7 @@ func (o *Client) WithAppendPath(path string) *Client {
 }
 
 func (o *Client) WithAuth(key, secret string) *Client {
-	//TODO
-	//o.s = NewSign(key, secret)
+	o.s = NewSign(key, secret)
 	return o
 }
 
