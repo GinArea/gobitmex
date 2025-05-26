@@ -1,4 +1,4 @@
-package bitmex
+package bitmexapi
 
 type Category string
 
