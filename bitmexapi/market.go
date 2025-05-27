@@ -153,7 +153,7 @@ type Candle struct {
 type GetCandle struct {
 	Symbol    string
 	BinSize   Bin
-	Patrial   bool      `url:",omitempty"` // default: false
+	Partial   bool      `url:",omitempty"` // default: false
 	Reverse   bool      `url:",omitempty"` // default: false
 	Count     int       `url:",omitempty"` // default: 100
 	StartTime time.Time `url:",omitempty"`

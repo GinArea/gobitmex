@@ -63,7 +63,7 @@ func Test_GetCandles(t *testing.T) {
 				Symbol:    "XBTUSDT",
 				BinSize:   Bin1m,
 				Reverse:   true,
-				Patrial:   true,
+				Partial:   true,
 				Count:     10,
 				StartTime: startTime,
 				EndTime:   endTime,
