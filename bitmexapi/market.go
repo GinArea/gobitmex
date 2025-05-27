@@ -155,9 +155,10 @@ type GetCandle struct {
 	BinSize   Bin
 	Patrial   bool      `url:",omitempty"` // default: false
 	Reverse   bool      `url:",omitempty"` // default: false
-	Count     int16     `url:",omitempty"` // default: 100
+	Count     int       `url:",omitempty"` // default: 100
 	StartTime time.Time `url:",omitempty"`
 	EndTime   time.Time `url:",omitempty"`
+	Columns   string    `url:",omitempty"`
 }
 
 func (o *Client) GetCandles(v GetCandle) Response[[]Candle] {
