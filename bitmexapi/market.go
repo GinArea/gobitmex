@@ -12,6 +12,10 @@ import (
 
 type GetInstrumentActive struct{}
 
+type GetInstrument struct {
+	Symbol string
+}
+
 type Instrument struct {
 	Symbol                         string
 	RootSymbol                     string
@@ -112,15 +116,20 @@ type Instrument struct {
 	// RebalanceInterval              time.Time
 }
 
-func getInstrumentsActive[T any](o GetInstrumentActive, c *Client) Response[[]T] {
-	return GetPub(c, "v1/instrument/active", o, identity[[]T])
+func (c *Client) GetInstrumentActive(v GetInstrumentActive) Response[[]Instrument] {
+	return v.Do(c)
 }
 
 func (o GetInstrumentActive) Do(c *Client) Response[[]Instrument] {
-	array := getInstrumentsActive[Instrument](o, c)
-	return array
+	return GetPub(c, "v1/instrument/active", o, identity[[]Instrument])
 }
 
-func (o *Client) GetInstrumentActive(v GetInstrumentActive) Response[[]Instrument] {
-	return v.Do(o)
+func (c *Client) GetInstrument(v GetInstrument) Response[[]Instrument] {
+	// returns single element array
+	return v.Do(c)
+
+}
+
+func (o GetInstrument) Do(c *Client) Response[[]Instrument] {
+	return GetPub(c, "v1/instrument", o, identity[[]Instrument])
 }
