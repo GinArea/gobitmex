@@ -153,12 +153,12 @@ type Candle struct {
 type GetCandle struct {
 	Symbol    string
 	BinSize   Bin
-	Partial   bool      `url:",omitempty"` // default: false
-	Reverse   bool      `url:",omitempty"` // default: false
-	Count     int       `url:",omitempty"` // default: 100
-	StartTime time.Time `url:",omitempty"`
-	EndTime   time.Time `url:",omitempty"`
-	Columns   string    `url:",omitempty"`
+	Partial   bool       `url:",omitempty"` // default: false
+	Reverse   bool       `url:",omitempty"` // default: false
+	Count     int        `url:",omitempty"` // default: 100
+	StartTime *time.Time `url:",omitempty"`
+	EndTime   *time.Time `url:",omitempty"`
+	Columns   string     `url:",omitempty"`
 }
 
 func (o *Client) GetCandles(v GetCandle) Response[[]Candle] {

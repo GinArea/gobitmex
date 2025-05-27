@@ -48,8 +48,8 @@ func Test_GetSingleInstrument(t *testing.T) {
 
 func Test_GetCandles(t *testing.T) {
 
-	startTime, _ := time.Parse(time.RFC3339, "2025-05-27T12:00:00Z")
-	endTime, _ := time.Parse(time.RFC3339, "2025-05-27T13:00:00.000Z")
+	startTime, _ := time.Parse(time.RFC3339, "2025-05-01T00:00:00Z")
+	endTime, _ := time.Parse(time.RFC3339, "2025-05-15T00:00:00.000Z")
 
 	tests := []struct {
 		name   string
@@ -61,12 +61,12 @@ func Test_GetCandles(t *testing.T) {
 			client: NewClient(),
 			query: GetCandle{
 				Symbol:    "XBTUSDT",
-				BinSize:   Bin1m,
+				BinSize:   Bin1d,
 				Reverse:   true,
 				Partial:   true,
 				Count:     10,
-				StartTime: startTime,
-				EndTime:   endTime,
+				StartTime: &startTime,
+				EndTime:   &endTime,
 			},
 		},
 	}
