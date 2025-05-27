@@ -108,7 +108,7 @@ type Instrument struct {
 	ClosingTimestamp               time.Time
 	OpeningTimestamp               time.Time
 
-	// есть в документации, но отсутствуют в ответе
+	// are in the documentation but are missing from the answer:
 	// CalcInterval                   time.Time
 	// PublishInterval                time.Time
 	// PublishTime                    time.Time
@@ -132,4 +132,38 @@ func (c *Client) GetInstrument(v GetInstrument) Response[[]Instrument] {
 
 func (o GetInstrument) Do(c *Client) Response[[]Instrument] {
 	return GetPub(c, "v1/instrument", o, identity[[]Instrument])
+}
+
+type Candle struct {
+	Timestamp       time.Time
+	Symbol          string
+	Open            ujson.Float64
+	High            ujson.Float64
+	Low             ujson.Float64
+	Close           ujson.Float64
+	Trades          ujson.Int64
+	Volume          ujson.Float64
+	Vwap            ujson.Float64
+	LastSize        ujson.Float64
+	Turnover        ujson.Float64
+	HomeNotional    ujson.Float64
+	ForeignNotional ujson.Float64
+}
+
+type GetCandle struct {
+	Symbol    string
+	BinSize   Bin
+	Patrial   bool      `url:",omitempty"` // default: false
+	Reverse   bool      `url:",omitempty"` // default: false
+	Count     int16     `url:",omitempty"` // default: 100
+	StartTime time.Time `url:",omitempty"`
+	EndTime   time.Time `url:",omitempty"`
+}
+
+func (o *Client) GetCandles(v GetCandle) Response[[]Candle] {
+	return v.Do(o)
+}
+
+func (o GetCandle) Do(c *Client) Response[[]Candle] {
+	return GetPub(c, "v1/trade/bucketed", o, identity[[]Candle])
 }
