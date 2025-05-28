@@ -18,7 +18,7 @@ func Test_GetInstrumentActive(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := tt.client.GetInstrumentActive(GetInstrumentActive{})
+			got := tt.client.GetInstrumentActive()
 			fmt.Printf("%v", got)
 		})
 	}

@@ -116,8 +116,8 @@ type Instrument struct {
 	// RebalanceInterval              time.Time
 }
 
-func (c *Client) GetInstrumentActive(v GetInstrumentActive) Response[[]Instrument] {
-	return v.Do(c)
+func (c *Client) GetInstrumentActive() Response[[]Instrument] {
+	return GetInstrumentActive{}.Do(c)
 }
 
 func (o GetInstrumentActive) Do(c *Client) Response[[]Instrument] {
