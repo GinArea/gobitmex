@@ -102,3 +102,29 @@ func (o *Client) GetUser() Response[User] {
 func (o GetUser) Do(c *Client) Response[User] {
 	return Get(c, "v1/user", o, identity[User])
 }
+
+// https://www.bitmex.com/api/explorer/#!/APIKey/APIKey_get
+
+type ApiKey struct {
+	Id              string
+	Secret          string
+	Name            string
+	Nonce           int
+	Cidr            string
+	Cidrs           []string
+	TargetAccountId int
+	Permissions     []string
+	Enabled         bool
+	UserId          int
+	Created         time.Time
+}
+
+type GetApiKey struct{}
+
+func (o *Client) GetApiKey() Response[[]ApiKey] {
+	return GetApiKey{}.Do(o)
+}
+
+func (o GetApiKey) Do(c *Client) Response[[]ApiKey] {
+	return Get(c, "v1/apiKey", o, identity[[]ApiKey])
+}
