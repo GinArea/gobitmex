@@ -44,15 +44,15 @@ func req[R, T any](c *Client, method string, path string, request any, transform
 		return
 	}
 	if sign && c.s != nil {
-		// if perf.Request.Header == nil {
-		// 	perf.Request.Header = make(http.Header)
-		// }
-		// switch method {
-		// case http.MethodGet:
-		// 	c.s.HeaderGet(perf.Request.Header, perf.Request.Params, path)
-		// case http.MethodPost:
-		// 	c.s.HeaderPost(perf.Request.Header, perf.Request.Body, path)
-		// }
+		if perf.Request.Header == nil {
+			perf.Request.Header = make(http.Header)
+		}
+		switch method {
+		case http.MethodGet:
+			c.s.HeaderGet(perf.Request.Header, perf.Request.Params, path)
+		case http.MethodPost:
+			c.s.HeaderPost(perf.Request.Header, perf.Request.Body, path)
+		}
 	}
 	httpResponse := perf.Do()
 	if httpResponse.Error == nil {
@@ -92,12 +92,14 @@ func (r *response[T]) parseJsonAndFillResponse(data uhttp.Response) error {
 	var errCheck struct {
 		Error *responseError `json:"error"`
 	}
-	if err := data.Json(errCheck); err == nil && errCheck.Error != nil {
+	err := data.Json(&errCheck)
+	if err == nil && errCheck.Error != nil {
 		r.ErrorResponse = errCheck.Error
 		return nil
 	}
 
 	result := new(T)
+	// log.Println(string(data.Body))
 	if err := data.Json(result); err != nil {
 		return err
 	}

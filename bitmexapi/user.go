@@ -12,7 +12,7 @@ type User struct {
 	AccountName           string      `json:"accountName"`
 	IsUser                bool        `json:"isUser"`
 	Email                 string      `json:"email"`
-	DateOfBirth           string      `json:"dateOfBirth"` // Consider parsing to time.Time if you expect ISO format
+	DateOfBirth           string      `json:"dateOfBirth"` // format "1980-04-12"
 	Phone                 string      `json:"phone"`
 	Created               time.Time   `json:"created"`
 	LastUpdated           time.Time   `json:"lastUpdated"`
@@ -27,6 +27,10 @@ type User struct {
 	IsElite               bool        `json:"isElite"`
 	LastKnownAuthority    string      `json:"lastKnownAuthority"`
 	Typ                   string      `json:"typ"`
+
+	// absent in docs
+	IsRestricted             bool `json:"isRestricted"`
+	HasPendingPeriodicReview bool `json:"hasPendingPeriodicReview"`
 }
 
 type Preferences struct {
