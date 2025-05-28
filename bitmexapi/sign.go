@@ -62,33 +62,27 @@ func (o *Sign) header(h http.Header, data string, path string, method string) {
 	expires := time.Now().Unix() + 5
 	expiresStr := strconv.FormatInt(expires, 10)
 	url := "/" + ApiVersion + "/" + path
-	signature, err := generateSignature(o.Secret, method, url, expiresStr, data)
-	if err == nil {
-		h.Set("api-key", o.Key)
-		h.Set("api-expires", expiresStr)
-		h.Set("api-signature", signature)
-	}
+	signature := generateSignature(o.Secret, method, url, expiresStr, data)
+	h.Set("api-key", o.Key)
+	h.Set("api-expires", expiresStr)
+	h.Set("api-signature", signature)
 }
 
-func generateSignature(secret, verb, rawURL string, expiresStr string, data string) (string, error) {
+func generateSignature(secret, method, path string, expiresStr string, data string) string {
 
-	// Parse the URL and extract the path and query
-	parsedURL, err := url.Parse(rawURL)
-	if err != nil {
-		return "", err
+	message := method + path + expiresStr
+	if data != "" {
+		if method == "GET" {
+			message = method + path + "?" + data + expiresStr
+		} else if method == "POST" {
+			message += data
+		}
 	}
-	path := parsedURL.Path
-	if parsedURL.RawQuery != "" {
-		path += "?" + parsedURL.RawQuery
-	}
-
-	// Construct the message to sign
-	message := verb + path + expiresStr + data
 
 	// Create the HMAC SHA256 signature
 	mac := hmac.New(sha256.New, []byte(secret))
 	mac.Write([]byte(message))
 	signature := hex.EncodeToString(mac.Sum(nil))
 
-	return signature, nil
+	return signature
 }

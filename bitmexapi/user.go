@@ -128,3 +128,33 @@ func (o *Client) GetApiKey() Response[[]ApiKey] {
 func (o GetApiKey) Do(c *Client) Response[[]ApiKey] {
 	return Get(c, "v1/apiKey", o, identity[[]ApiKey])
 }
+
+// https://docs.bitmex.com/api-explorer/user-affiliates-get
+
+type UserAffiliates struct {
+	UserID    int       `json:"userId"`
+	Lifecycle Lifecycle `json:"lifecycle"`
+}
+
+type Lifecycle struct {
+	Country       string    `json:"COUNTRY"`
+	Registered    time.Time `json:"REGISTERED"`
+	EmailVerified time.Time `json:"EMAIL_VERIFIED"`
+	KYCCompleted  time.Time `json:"KYC_COMPLETED"`
+	FirstDeposit  time.Time `json:"FIRST_DEPOSIT"`
+	FirstTrade    time.Time `json:"FIRST_TRADE"`
+}
+
+type GetAffiliates struct {
+	Depth           string `url:"depth,omitempty"`
+	SelectUserId    string `url:"selectUserId,omitempty"`
+	TargetAccountId string `url:"targetAccountId,omitempty"`
+}
+
+func (o *Client) GetUserAffiliates(v GetAffiliates) Response[[]UserAffiliates] {
+	return v.Do(o)
+}
+
+func (o GetAffiliates) Do(c *Client) Response[[]UserAffiliates] {
+	return Get(c, "v1/userAffiliates", o, identity[[]UserAffiliates])
+}
