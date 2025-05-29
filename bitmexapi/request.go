@@ -3,6 +3,7 @@ package bitmexapi
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/msw-x/moon/ufmt"
@@ -15,6 +16,10 @@ func GetPub[R, T any](c *Client, path string, req any, transform func(R) (T, err
 
 func Get[R, T any](c *Client, path string, req any, transform func(R) (T, error)) Response[T] {
 	return request(c, http.MethodGet, path, req, transform, true)
+}
+
+func Post[R, T any](c *Client, path string, req any, transform func(R) (T, error)) Response[T] {
+	return request(c, http.MethodPost, path, req, transform, true)
 }
 
 func request[R, T any](c *Client, method string, path string, request any, transform func(R) (T, error), sign bool) (r Response[T]) {
@@ -99,7 +104,7 @@ func (r *response[T]) parseJsonAndFillResponse(data uhttp.Response) error {
 	}
 
 	result := new(T)
-	// log.Println(string(data.Body))
+	log.Println(string(data.Body))
 	if err := data.Json(result); err != nil {
 		return err
 	}

@@ -65,8 +65,8 @@ type Position struct {
 
 type GetPosition struct{}
 
-func (o *Client) GetPositions(v GetPosition) Response[[]Position] {
-	return v.Do(o)
+func (o *Client) GetPositions() Response[[]Position] {
+	return GetPosition{}.Do(o)
 }
 
 func (o GetPosition) Do(c *Client) Response[[]Position] {

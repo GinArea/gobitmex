@@ -58,7 +58,7 @@ func Test_GetSingleInstrument(t *testing.T) {
 			name:   "Get Instrument Active",
 			client: NewClient(),
 			instrument: GetInstrument{
-				Symbol: "ADAUSD",
+				Symbol: "ETH_USDT",
 			},
 		},
 	}
