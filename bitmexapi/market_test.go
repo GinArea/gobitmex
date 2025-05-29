@@ -2,9 +2,33 @@ package bitmexapi
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 )
+
+func Test_GetAssetsConfig(t *testing.T) {
+	tests := []struct {
+		name   string
+		client *Client
+	}{
+		{
+			name:   "Get Assets Config test",
+			client: NewClient(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.client.GetAssetsConfig(GetAssetsConfig{})
+			for _, a := range got.Data {
+				if strings.ToUpper(a.Currency) != a.Asset {
+					fmt.Printf("%v", a)
+				}
+			}
+			fmt.Printf("%v", got)
+		})
+	}
+}
 
 func Test_GetInstrumentActive(t *testing.T) {
 	tests := []struct {

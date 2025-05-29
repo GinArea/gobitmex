@@ -168,3 +168,41 @@ func (o *Client) GetCandles(v GetCandle) Response[[]Candle] {
 func (o GetCandle) Do(c *Client) Response[[]Candle] {
 	return GetPub(c, "v1/trade/bucketed", o, identity[[]Candle])
 }
+
+// https://docs.bitmex.com/api-explorer/get-wallet-assets
+
+type AssetsConfig struct {
+	Asset               string        `json:"asset"`
+	Currency            string        `json:"currency"`
+	MajorCurrency       string        `json:"majorCurrency"`
+	Name                string        `json:"name"`
+	CurrencyType        string        `json:"currencyType"`
+	Scale               int           `json:"scale"`
+	Enabled             bool          `json:"enabled"`
+	IsMarginCurrency    bool          `json:"isMarginCurrency"`
+	MinDepositAmount    ujson.Float64 `json:"minDepositAmount"`
+	MinWithdrawalAmount ujson.Float64 `json:"minWithdrawalAmount"`
+	MaxWithdrawalAmount ujson.Float64 `json:"maxWithdrawalAmount"`
+	MemoRequired        bool          `json:"memoRequired"`
+	Networks            []Network     `json:"networks"`
+}
+
+type Network struct {
+	Asset             string        `json:"asset"`
+	TokenAddress      string        `json:"tokenAddress"`
+	DepositEnabled    bool          `json:"depositEnabled"`
+	WithdrawalEnabled bool          `json:"withdrawalEnabled"`
+	WithdrawalFee     ujson.Float64 `json:"withdrawalFee"`
+	MinFee            ujson.Float64 `json:"minFee"`
+	MaxFee            ujson.Float64 `json:"maxFee"`
+}
+
+type GetAssetsConfig struct{}
+
+func (o *Client) GetAssetsConfig(v GetAssetsConfig) Response[[]AssetsConfig] {
+	return v.Do(o)
+}
+
+func (o GetAssetsConfig) Do(c *Client) Response[[]AssetsConfig] {
+	return GetPub(c, "v1/wallet/assets", o, identity[[]AssetsConfig])
+}
