@@ -199,8 +199,8 @@ type Network struct {
 
 type GetAssetsConfig struct{}
 
-func (o *Client) GetAssetsConfig(v GetAssetsConfig) Response[[]AssetsConfig] {
-	return v.Do(o)
+func (o *Client) GetAssetsConfig() Response[[]AssetsConfig] {
+	return GetAssetsConfig{}.Do(o)
 }
 
 func (o GetAssetsConfig) Do(c *Client) Response[[]AssetsConfig] {

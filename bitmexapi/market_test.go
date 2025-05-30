@@ -19,7 +19,7 @@ func Test_GetAssetsConfig(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := tt.client.GetAssetsConfig(GetAssetsConfig{})
+			got := tt.client.GetAssetsConfig()
 			for _, a := range got.Data {
 				if strings.ToUpper(a.Currency) != a.Asset {
 					fmt.Printf("%v", a)

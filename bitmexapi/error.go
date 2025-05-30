@@ -38,3 +38,11 @@ func (o *Error) UnmatchedIp() bool {
 	}
 	return unmatched
 }
+
+func (o *Error) InsufficientBalance() (insufficient bool) {
+	lowerCasedMessage := strings.ToLower(o.Message)
+	if strings.Contains(lowerCasedMessage, "insufficient available balance") {
+		insufficient = true
+	}
+	return
+}
