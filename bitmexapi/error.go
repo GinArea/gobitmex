@@ -46,3 +46,18 @@ func (o *Error) InsufficientBalance() (insufficient bool) {
 	}
 	return
 }
+
+func (o *Error) Timeout() (timeout bool) {
+
+	/*
+	   not real example, AI helped
+	*/
+
+	lowerCasedMessage := strings.ToLower(o.Message)
+	if strings.Contains(lowerCasedMessage, "gateway timeout") ||
+		strings.Contains(lowerCasedMessage, "bad gateway") ||
+		strings.Contains(lowerCasedMessage, "system is currently overloaded") {
+		timeout = true
+	}
+	return
+}
