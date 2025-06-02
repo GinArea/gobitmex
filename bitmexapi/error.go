@@ -61,3 +61,11 @@ func (o *Error) Timeout() (timeout bool) {
 	}
 	return
 }
+
+func (o *Error) Restricted() (restricted bool) {
+	lowerCasedMessage := strings.ToLower(o.Message)
+	if strings.Contains(lowerCasedMessage, "restricted") {
+		restricted = true
+	}
+	return
+}
