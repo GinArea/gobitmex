@@ -79,6 +79,8 @@ func generateSignature(secret, method, path string, expiresStr string, data stri
 		}
 	}
 
+	// log.Println(message)
+
 	// Create the HMAC SHA256 signature
 	mac := hmac.New(sha256.New, []byte(secret))
 	mac.Write([]byte(message))

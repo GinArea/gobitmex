@@ -105,9 +105,23 @@ func (r *response[T]) parseJsonAndFillResponse(data uhttp.Response) error {
 
 	result := new(T)
 	log.Println(string(data.Body))
-	if err := data.Json(result); err != nil {
-		return err
+	if err := data.Json(result); err == nil {
+		r.Data = *result
+		return nil
 	}
-	r.Data = *result
-	return nil
+
+	// Fallback: try to parse {"message": "..."} format
+	var msgOnly struct {
+		Message string `json:"message"`
+	}
+	if err := data.Json(&msgOnly); err == nil && msgOnly.Message != "" {
+		r.ErrorResponse = &responseError{
+			Message: msgOnly.Message,
+			Name:    "MessageOnly",
+		}
+		return nil
+	}
+
+	// Final fallback: return last JSON error
+	return fmt.Errorf("unrecognized response format or JSON parse error")
 }
