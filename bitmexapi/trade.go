@@ -91,12 +91,12 @@ type TradeHistory struct {
 	Account               int64         `json:"account"`
 	Symbol                string        `json:"symbol"`
 	Side                  string        `json:"side"`
-	LastQty               int64         `json:"lastQty"`
+	LastQty               ujson.Float64 `json:"lastQty"`
 	LastPx                ujson.Float64 `json:"lastPx"`
 	LastLiquidityInd      string        `json:"lastLiquidityInd"`
-	OrderQty              int64         `json:"orderQty"`
+	OrderQty              ujson.Float64 `json:"orderQty"`
 	Price                 ujson.Float64 `json:"price"`
-	DisplayQty            int64         `json:"displayQty"`
+	DisplayQty            ujson.Float64 `json:"displayQty"`
 	StopPx                ujson.Float64 `json:"stopPx"`
 	PegOffsetValue        ujson.Float64 `json:"pegOffsetValue"`
 	PegPriceType          string        `json:"pegPriceType"`
@@ -111,8 +111,8 @@ type TradeHistory struct {
 	Triggered             string        `json:"triggered"`
 	WorkingIndicator      bool          `json:"workingIndicator"`
 	OrdRejReason          string        `json:"ordRejReason"`
-	LeavesQty             int64         `json:"leavesQty"`
-	CumQty                int64         `json:"cumQty"`
+	LeavesQty             ujson.Float64 `json:"leavesQty"`
+	CumQty                ujson.Float64 `json:"cumQty"`
 	AvgPx                 ujson.Float64 `json:"avgPx"`
 	Commission            ujson.Float64 `json:"commission"`
 	BrokerCommission      ujson.Float64 `json:"brokerCommission"`
@@ -120,14 +120,14 @@ type TradeHistory struct {
 	TradePublishIndicator string        `json:"tradePublishIndicator"`
 	Text                  string        `json:"text"`
 	TrdMatchID            string        `json:"trdMatchID"`
-	ExecCost              int64         `json:"execCost"`
+	ExecCost              ujson.Float64 `json:"execCost"`
 	ExecComm              ujson.Float64 `json:"execComm"`
 	BrokerExecComm        ujson.Float64 `json:"brokerExecComm"`
 	HomeNotional          ujson.Float64 `json:"homeNotional"`
 	ForeignNotional       ujson.Float64 `json:"foreignNotional"`
 	TransactTime          time.Time     `json:"transactTime"`
 	Timestamp             time.Time     `json:"timestamp"`
-	RealisedPnl           int64         `json:"realisedPnl"`
+	RealisedPnl           ujson.Float64 `json:"realisedPnl"`
 	TrdType               string        `json:"trdType"`
 }
 
