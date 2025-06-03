@@ -206,3 +206,12 @@ func (o *Client) GetAssetsConfig() Response[[]AssetsConfig] {
 func (o GetAssetsConfig) Do(c *Client) Response[[]AssetsConfig] {
 	return GetPub(c, "v1/wallet/assets", o, identity[[]AssetsConfig])
 }
+
+type WsOrderbook struct {
+	Symbol    string        `json:"symbol"`
+	Id        int           `json:"id"`
+	Side      string        `json:"side"`
+	Size      ujson.Float64 `json:"size"`
+	Price     ujson.Float64 `json:"price"`
+	Timestamp time.Time     `json:"time"`
+}
