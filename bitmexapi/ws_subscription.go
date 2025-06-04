@@ -50,27 +50,57 @@ func (o *Subscriptions) processTopic(data []byte) (err error) {
 	var topic RawTopic
 	err = json.Unmarshal(data, &topic)
 	if err == nil {
-		f := o.getFunc(topic.Table)
-		if f == nil {
-			err = fmt.Errorf("subscription of topic[%s] not found", topic.Table)
+		blocks := o.getFunctions(topic.Table)
+		if len(blocks) == 0 {
+			err = fmt.Errorf("subscriptions of topic[%s] not found", topic.Table)
 		} else {
-			err = f(topic)
+			for _, block := range blocks {
+				err = block.f(topic, block.market)
+				if err != nil {
+					return
+				}
+			}
 		}
 	}
 	return
 }
 
-func (o *Subscriptions) getFunc(name string) (f SubscriptionFunc) {
+func (o *Subscriptions) getFunctions(table string) (blocks []SubscriptioinBlock) {
 	o.mutex.Lock()
 	defer o.mutex.Unlock()
-	for topic, fn := range o.funcs {
-		if strings.HasPrefix(name, topic) {
-			f = fn
-			break
+	for key, fn := range o.funcs {
+		/*
+			For orderbook subscriptions key is (for example) -> orderBookL2_25:ETHUSDT
+			`table` value inside raw message is -> orderBookL2_25
+			We need to find all subscribed functions:
+		*/
+		if strings.HasPrefix(key, table) {
+			parts := strings.Split(key, ":")
+			var market string
+			if len(parts) > 1 {
+				market = parts[1]
+			}
+
+			blocks = append(blocks, SubscriptioinBlock{
+				f:      fn,
+				market: market,
+			})
 		}
 	}
 	return
 }
+
+// func (o *Subscriptions) getFunc(name string) (f SubscriptionFunc) {
+// 	o.mutex.Lock()
+// 	defer o.mutex.Unlock()
+// 	for topic, fn := range o.funcs {
+// 		if strings.HasPrefix(name, topic) {
+// 			f = fn
+// 			break
+// 		}
+// 	}
+// 	return
+// }
 
 type SubscriptionClient interface {
 	Ready() bool
@@ -78,6 +108,11 @@ type SubscriptionClient interface {
 	unsubscribe(string)
 }
 
-type SubscriptionFunc func(RawTopic) error
+type SubscriptioinBlock struct {
+	f      SubscriptionFunc
+	market string
+}
+
+type SubscriptionFunc func(RawTopic, string) error
 
 type SubscriptionFuncs map[string]SubscriptionFunc

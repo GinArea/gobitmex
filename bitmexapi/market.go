@@ -208,10 +208,22 @@ func (o GetAssetsConfig) Do(c *Client) Response[[]AssetsConfig] {
 }
 
 type WsOrderbook struct {
-	Symbol    string        `json:"symbol"`
-	Id        int           `json:"id"`
-	Side      string        `json:"side"`
-	Size      ujson.Float64 `json:"size"`
-	Price     ujson.Float64 `json:"price"`
-	Timestamp time.Time     `json:"time"`
+	Symbol       string        `json:"symbol"`
+	Id           int           `json:"id"`
+	Side         string        `json:"side"`
+	Size         ujson.Float64 `json:"size"`
+	Price        ujson.Float64 `json:"price"`
+	Timestamp    time.Time     `json:"timestamp"`
+	TransactTime time.Time     `json:"transactTime"`
+}
+
+type WsOrderbookSlice []WsOrderbook
+
+func (o WsOrderbookSlice) GetMarket() string {
+	var market string
+	for _, entry := range o {
+		market = entry.Symbol
+		break
+	}
+	return market
 }

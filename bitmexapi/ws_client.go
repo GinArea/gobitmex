@@ -3,7 +3,6 @@ package bitmexapi
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -111,7 +110,6 @@ func (o *WsClient[T]) Send(r any) {
 }
 
 func (o *WsClient[T]) Subscribe(s string) {
-	//o.SubscribeBatch([]string{s, "orderBookL2_25:MELANIAUSDT"}) // для теста
 	o.SubscribeBatch([]string{s})
 }
 
@@ -148,7 +146,7 @@ func (o *WsClient[T]) onMessage(messageType int, data []byte) {
 		return
 	}
 
-	fmt.Printf("%s\n", data)
+	// fmt.Printf("%s\n", data)
 
 	var r T
 	err := json.Unmarshal(data, &r)

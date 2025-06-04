@@ -8,12 +8,14 @@ import (
 
 func TestOrderBook(t *testing.T) {
 	tests := []struct {
-		name   string
-		symbol string
+		name    string
+		symbol1 string
+		symbol2 string
 	}{
 		{
-			name:   "Orderbook",
-			symbol: "WOOUSDT",
+			name:    "Orderbook",
+			symbol1: "ETHUSDT",
+			symbol2: "MELANIAUSDT",
 		},
 	}
 	for _, tt := range tests {
@@ -21,13 +23,14 @@ func TestOrderBook(t *testing.T) {
 			wsClient := NewWsPublic()
 			wsClient.Run()
 			time.Sleep(time.Duration(time.Second * 5))
-			wsClient.Orderbook(tt.symbol).Subscribe(func(v Topic[[]WsOrderbook]) {
-				fmt.Printf("%v\n\n", v)
+			wsClient.Orderbook(tt.symbol1).SubscribeOrderbook(func(v Topic[WsOrderbookSlice]) {
+				fmt.Printf("[%v] %v\n\n", tt.symbol1, v)
 			})
-			// wsClient.Orderbook("MELANIAUSDT").Subscribe(func(v Topic[[]WsOrderbook]) {
-			// 	fmt.Printf("%v\n\n", v)
-			// })
-			// wsClient.Orderbook(tt.symbol).Unsubscribe()
+			wsClient.Orderbook(tt.symbol2).SubscribeOrderbook(func(v Topic[WsOrderbookSlice]) {
+				fmt.Printf("[%v] %v\n\n", tt.symbol2, v)
+			})
+			time.Sleep(time.Duration(time.Second * 10))
+			wsClient.Orderbook(tt.symbol1).UnsubscribeOrderbook()
 			time.Sleep(time.Duration(time.Second * 3600))
 		})
 	}

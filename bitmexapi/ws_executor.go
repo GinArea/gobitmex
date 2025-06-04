@@ -1,27 +1,43 @@
 package bitmexapi
 
-type Executor[T any] struct {
-	topic         string
+import (
+	"fmt"
+	"strings"
+)
+
+type Executor[T Validatable] struct {
+	table         string
+	market        string
 	subscriptions *Subscriptions
 }
 
-func NewExecutor[T any](topic string, subscriptions *Subscriptions) *Executor[T] {
+type Validatable interface {
+	GetMarket() string
+}
+
+func NewExecutor[T Validatable](table, market string, subscriptions *Subscriptions) *Executor[T] {
 	o := new(Executor[T])
-	o.topic = topic
+	o.table = table
+	o.market = market
 	o.subscriptions = subscriptions
 	return o
 }
 
-func (o *Executor[T]) Subscribe(onShot func(Topic[T])) {
-	o.subscriptions.subscribe(o.topic, func(raw RawTopic) error {
+func (o *Executor[T]) SubscribeOrderbook(onShot func(Topic[T])) {
+	topic := fmt.Sprintf("%v:%v", o.table, o.market)
+	o.subscriptions.subscribe(topic, func(raw RawTopic, market string) error {
 		topic, err := UnmarshalRawTopic[T](raw)
 		if err == nil {
-			onShot(topic)
+			currentMarket := topic.Data.GetMarket()
+			if strings.EqualFold(currentMarket, market) {
+				onShot(topic)
+			}
 		}
 		return err
 	})
 }
 
-func (o *Executor[T]) Unsubscribe() {
-	o.subscriptions.unsubscribe(o.topic)
+func (o *Executor[T]) UnsubscribeOrderbook() {
+	topic := fmt.Sprintf("%v:%v", o.table, o.market)
+	o.subscriptions.unsubscribe(topic)
 }

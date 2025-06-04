@@ -12,6 +12,7 @@ type RawTopic Topic[json.RawMessage]
 
 func UnmarshalRawTopic[T any](raw RawTopic) (ret Topic[T], err error) {
 	ret.Table = raw.Table
+	ret.Action = raw.Action
 	err = json.Unmarshal(raw.Data, &ret.Data)
 	return
 }
