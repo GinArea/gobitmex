@@ -1,6 +1,7 @@
 package bitmexapi
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/msw-x/moon/ulog"
@@ -111,4 +112,9 @@ func (o *WsPublic) onTopic(data []byte) error {
 
 func (o *WsPublic) Orderbook(symbol string) *Executor[WsOrderbookSlice] {
 	return NewExecutor[WsOrderbookSlice]("orderBookL2_25", symbol, o.subscriptions)
+}
+
+func (o *WsPublic) Candles(symbol string, interval Bin) *Executor[WsCandleSlice] {
+	topic := fmt.Sprintf("tradeBin%v", interval)
+	return NewExecutor[WsCandleSlice](topic, symbol, o.subscriptions)
 }

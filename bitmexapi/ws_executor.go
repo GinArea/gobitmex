@@ -23,7 +23,8 @@ func NewExecutor[T Validatable](table, market string, subscriptions *Subscriptio
 	return o
 }
 
-func (o *Executor[T]) SubscribeOrderbook(onShot func(Topic[T])) {
+// suitable for Orderbook + Candles
+func (o *Executor[T]) Subscribe(onShot func(Topic[T])) {
 	topic := fmt.Sprintf("%v:%v", o.table, o.market)
 	o.subscriptions.subscribe(topic, func(raw RawTopic, market string) error {
 		topic, err := UnmarshalRawTopic[T](raw)
@@ -37,7 +38,7 @@ func (o *Executor[T]) SubscribeOrderbook(onShot func(Topic[T])) {
 	})
 }
 
-func (o *Executor[T]) UnsubscribeOrderbook() {
+func (o *Executor[T]) Unsubscribe() {
 	topic := fmt.Sprintf("%v:%v", o.table, o.market)
 	o.subscriptions.unsubscribe(topic)
 }

@@ -227,3 +227,14 @@ func (o WsOrderbookSlice) GetMarket() string {
 	}
 	return market
 }
+
+type WsCandleSlice []Candle
+
+func (o WsCandleSlice) GetMarket() string {
+	var market string
+	for _, entry := range o {
+		market = entry.Symbol
+		break
+	}
+	return market
+}
