@@ -62,14 +62,20 @@ func (o *Sign) header(h http.Header, data string, path string, method string) {
 	expires := time.Now().Unix() + 5
 	expiresStr := strconv.FormatInt(expires, 10)
 	url := "/" + ApiVersion + "/" + path
-	signature := generateSignature(o.Secret, method, url, expiresStr, data)
+	signature := GenerateSignature(o.Secret, method, url, expiresStr, data)
 	h.Set("api-key", o.Key)
 	h.Set("api-expires", expiresStr)
 	h.Set("api-signature", signature)
 }
 
-func generateSignature(secret, method, path string, expiresStr string, data string) string {
+func (o *Sign) GetWsSIgnData() (signature, expires string) {
+	e := time.Now().Unix() + 105 // 5 seconds not enough
+	expires = strconv.FormatInt(e, 10)
+	signature = GenerateSignature(o.Secret, "GET", "/realtime", expires, "")
+	return
+}
 
+func GenerateSignature(secret, method, path string, expiresStr string, data string) string {
 	message := method + path + expiresStr
 	if data != "" {
 		if method == "GET" {
@@ -78,9 +84,6 @@ func generateSignature(secret, method, path string, expiresStr string, data stri
 			message += data
 		}
 	}
-
-	// log.Println(message)
-
 	// Create the HMAC SHA256 signature
 	mac := hmac.New(sha256.New, []byte(secret))
 	mac.Write([]byte(message))

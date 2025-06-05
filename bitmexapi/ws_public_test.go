@@ -6,6 +6,23 @@ import (
 	"time"
 )
 
+func TestConnection(t *testing.T) {
+	tests := []struct {
+		name string
+	}{
+		{
+			name: "connection testing",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			wsClient := NewWsPublic()
+			wsClient.Run()
+			time.Sleep(time.Duration(time.Second * 3600))
+		})
+	}
+}
+
 func TestOrderBook(t *testing.T) {
 	tests := []struct {
 		name    string
