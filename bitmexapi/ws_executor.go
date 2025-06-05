@@ -23,9 +23,11 @@ func NewExecutor[T Validatable](table, market string, subscriptions *Subscriptio
 	return o
 }
 
-// suitable for Orderbook + Candles
 func (o *Executor[T]) Subscribe(onShot func(Topic[T])) {
-	topic := fmt.Sprintf("%v:%v", o.table, o.market)
+	topic := o.table
+	if o.market != "" {
+		topic += fmt.Sprintf(":%v", o.market)
+	}
 	o.subscriptions.subscribe(topic, func(raw RawTopic, market string) error {
 		topic, err := UnmarshalRawTopic[T](raw)
 		if err == nil {

@@ -134,3 +134,19 @@ func (o *WsPrivate) onResponse(r WsBaseResponse) error {
 	}
 	return nil
 }
+
+func (o *WsPrivate) Wallet() *Executor[WalletShot] {
+	return NewExecutor[WalletShot]("wallet", "", o.subscriptions)
+}
+
+func (o *WsPrivate) Orders() *Executor[WsOrderDetailSlice] {
+	return NewExecutor[WsOrderDetailSlice]("order", "", o.subscriptions)
+}
+
+func (o *WsPrivate) Executions() *Executor[WsTradeHistorySlice] {
+	return NewExecutor[WsTradeHistorySlice]("execution", "", o.subscriptions)
+}
+
+func (o *WsPrivate) Positions() *Executor[WsPositionSlice] {
+	return NewExecutor[WsPositionSlice]("position", "", o.subscriptions)
+}

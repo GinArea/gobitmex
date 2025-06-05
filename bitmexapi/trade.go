@@ -18,6 +18,12 @@ type PlaceOrder struct {
 	Text       string      `json:",omitempty"`
 }
 
+type WsOrderDetailSlice []OrderDetail
+
+func (o WsOrderDetailSlice) GetMarket() string {
+	return ""
+}
+
 type OrderDetail struct {
 	OrderID          string        `json:"orderID"`
 	ClOrdID          string        `json:"clOrdID"`
@@ -81,6 +87,12 @@ func (o GetOrder) DoOrderDetail(c *Client) Response[[]OrderDetail] {
 	}
 
 	return Get(c, "v1/order", req, identity[[]OrderDetail])
+}
+
+type WsTradeHistorySlice []TradeHistory
+
+func (o WsTradeHistorySlice) GetMarket() (market string) {
+	return
 }
 
 type TradeHistory struct {

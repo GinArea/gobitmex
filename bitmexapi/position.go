@@ -6,6 +6,12 @@ import (
 	"github.com/msw-x/moon/ujson"
 )
 
+type WsPositionSlice []Position
+
+func (o WsPositionSlice) GetMarket() (market string) {
+	return
+}
+
 type Position struct {
 	Account              int64         `json:"account"`
 	Symbol               string        `json:"symbol"`

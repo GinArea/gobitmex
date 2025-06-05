@@ -24,6 +24,12 @@ type Wallet struct {
 	Timestamp      time.Time
 }
 
+type WalletShot []Wallet
+
+func (o WalletShot) GetMarket() (market string) {
+	return
+}
+
 func (o *Client) GetWalletBalance() Response[[]Wallet] {
 	request := GetWallet{
 		Currency: "all",
