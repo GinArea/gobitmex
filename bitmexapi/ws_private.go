@@ -135,8 +135,8 @@ func (o *WsPrivate) onResponse(r WsBaseResponse) error {
 	return nil
 }
 
-func (o *WsPrivate) Wallet() *Executor[WalletShot] {
-	return NewExecutor[WalletShot]("wallet", "", o.subscriptions)
+func (o *WsPrivate) Wallet() *Executor[WsWalletSlice] {
+	return NewExecutor[WsWalletSlice]("wallet", "", o.subscriptions)
 }
 
 func (o *WsPrivate) Orders() *Executor[WsOrderDetailSlice] {

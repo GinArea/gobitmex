@@ -24,9 +24,9 @@ type Wallet struct {
 	Timestamp      time.Time
 }
 
-type WalletShot []Wallet
+type WsWalletSlice []Wallet
 
-func (o WalletShot) GetMarket() (market string) {
+func (o WsWalletSlice) GetMarket() (market string) {
 	return
 }
 
