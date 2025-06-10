@@ -2,6 +2,7 @@ package bitmexapi
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/msw-x/moon/ulog"
 )
@@ -36,10 +37,10 @@ type WsResponse interface {
 }
 
 type WsBaseResponse struct {
-	Success     bool          `json:"success"`
-	Subscribe   string        `json:"subscribe"`
-	Unsubscribe string        `json:"unsubscribe"`
-	Request     []interface{} `json:"request"`
+	Success     bool        `json:"success"`
+	Subscribe   string      `json:"subscribe"`
+	Unsubscribe string      `json:"unsubscribe"`
+	Request     interface{} `json:"request"`
 
 	Status int    `json:"status"`
 	Error  string `json:"error"`
@@ -75,9 +76,11 @@ func (o WsBaseResponse) Log(log *ulog.Log) {
 		log.Info(fmt.Sprintf("subscribe: %v", o.Success))
 	} else if o.Unsubscribe != "" {
 		log.Info(fmt.Sprintf("unsubscribe: %v", o.Success))
+	} else if strings.HasPrefix(o.Info, "Welcome") {
+		log.Info(fmt.Sprintf("Connected: %v", o.Success))
 	} else {
 		if o.Table == "" {
-			log.Errorf("invalid response: %+v", o)
+			log.Errorf("unhandled response: %+v", o)
 		}
 	}
 }

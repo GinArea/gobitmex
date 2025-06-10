@@ -119,16 +119,13 @@ func (o *WsPrivate) onTopic(data []byte) error {
 
 func (o *WsPrivate) onResponse(r WsBaseResponse) error {
 	log := o.c.Log()
-	infoMessage := strings.ToLower(r.Info)
-	if strings.HasPrefix(infoMessage, "welcome") {
-		log.Info("authentication successful")
+	if strings.HasPrefix(r.Info, "Welcome") {
 		o.ready = true
 		if o.onReady != nil {
 			o.onReady()
 		}
-	} else {
-		r.Log(log)
 	}
+	r.Log(log)
 	return nil
 }
 
