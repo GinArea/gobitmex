@@ -22,6 +22,7 @@ type WsPrivate struct {
 func NewWsPrivate(key, secret string) *WsPrivate {
 	o := new(WsPrivate)
 	o.c = NewWsClient[WsBaseResponse]()
+	o.c.c.WithOnPreDial(o.getUrl)
 	o.s = NewSign(key, secret)
 	o.subscriptions = NewSubscriptions(o)
 	o.onReady = func() {
@@ -97,10 +98,6 @@ func (o *WsPrivate) Run() {
 	})
 	o.c.WithOnResponse(o.onResponse)
 	o.c.WithOnTopic(o.onTopic)
-
-	signature, expires := o.s.GetWsSIgnData()
-	base := fmt.Sprintf("%v?api-expires=%v&api-signature=%v&api-key=%v", WebsocketUrl, expires, signature, o.s.Key)
-	o.c.c.WithBase(base)
 	o.c.Run()
 }
 
@@ -149,4 +146,14 @@ func (o *WsPrivate) Executions() *Executor[WsTradeHistorySlice] {
 
 func (o *WsPrivate) Positions() *Executor[WsPositionSlice] {
 	return NewExecutor[WsPositionSlice]("position", "", o.subscriptions)
+}
+
+func (o *WsPrivate) getUrl(string) string {
+	if o.s == nil {
+		return WebsocketUrl
+	} else {
+		signature, expires := o.s.GetWsSignData()
+		base := fmt.Sprintf("%v?api-expires=%v&api-signature=%v&api-key=%v", WebsocketUrl, expires, signature, o.s.Key)
+		return base
+	}
 }

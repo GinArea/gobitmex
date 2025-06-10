@@ -68,7 +68,7 @@ func (o *Sign) header(h http.Header, data string, path string, method string) {
 	h.Set("api-signature", signature)
 }
 
-func (o *Sign) GetWsSIgnData() (signature, expires string) {
+func (o *Sign) GetWsSignData() (signature, expires string) {
 	e := time.Now().Unix() + 105 // 5 seconds not enough
 	expires = strconv.FormatInt(e, 10)
 	signature = GenerateSignature(o.Secret, "GET", "/realtime", expires, "")
