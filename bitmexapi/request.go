@@ -3,7 +3,6 @@ package bitmexapi
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/msw-x/moon/ufmt"
@@ -104,7 +103,7 @@ func (r *response[T]) parseJsonAndFillResponse(data uhttp.Response) error {
 	}
 
 	result := new(T)
-	log.Println(string(data.Body))
+	//log.Println(string(data.Body))
 	if err := data.Json(result); err == nil {
 		r.Data = *result
 		return nil

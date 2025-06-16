@@ -151,6 +151,7 @@ func (o *WsPrivate) getUrl(string) string {
 	} else {
 		signature, expires := o.s.GetWsSignData()
 		base := fmt.Sprintf("%v?api-expires=%v&api-signature=%v&api-key=%v", WebsocketUrl, expires, signature, o.s.Key)
+		ulog.Tracef("PreDial: %v", base)
 		return base
 	}
 }

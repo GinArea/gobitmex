@@ -155,6 +155,12 @@ func (o *WsClient[T]) onMessage(messageType int, data []byte) {
 			err = o.onResponse(r)
 		} else if r.IsWelcome() && o.onResponse != nil {
 			err = o.onResponse(r)
+		} else if r.TokenExpired() {
+			if o.onResponse != nil {
+				err = o.onResponse(r)
+			} else {
+				ulog.Tracef("TokenExpired, but onResponse is nil")
+			}
 		} else if o.onTopic != nil {
 			err = o.onTopic(data)
 		}

@@ -31,6 +31,7 @@ import (
 type WsResponse interface {
 	IsSubscription() bool
 	IsWelcome() bool
+	TokenExpired() bool
 	OperationIs(string) bool
 	Ok() bool
 	Log(*ulog.Log)
@@ -53,6 +54,10 @@ type WsBaseResponse struct {
 	Types  interface{}   `json:"types"`
 	Action string        `json:"action"`
 	Data   []interface{} `json:"data"`
+}
+
+func (o WsBaseResponse) TokenExpired() bool {
+	return o.Status == 419
 }
 
 func (o WsBaseResponse) IsWelcome() bool {
