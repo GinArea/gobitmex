@@ -24,6 +24,9 @@ func (o *Error) ApiKeyInvalid() bool {
 	} else if strings.Contains(lowerCasedMessage, "key is disabled") {
 		// "This key is disabled."
 		invalid = true
+	} else if strings.Contains(lowerCasedMessage, "invalid use of subaccount api key") {
+		// subAccount keys
+		invalid = true
 	}
 	return invalid
 }
