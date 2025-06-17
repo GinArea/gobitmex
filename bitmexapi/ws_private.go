@@ -96,6 +96,18 @@ func (o *WsPrivate) Run() {
 			o.onDisconnected()
 		}
 	})
+	o.c.WithOnDialError(func(e error) bool {
+		o.ready = false
+		er := strings.ToLower(e.Error())
+		if strings.Contains(er, "401 unauthorized") {
+			// need to stop
+			o.c.c.Cancel()
+			return true // does not matter
+		} else {
+			// need to retry with delay
+			return false
+		}
+	})
 	o.c.WithOnResponse(o.onResponse)
 	o.c.WithOnTopic(o.onTopic)
 	o.c.Run()
@@ -151,7 +163,6 @@ func (o *WsPrivate) getUrl(string) string {
 	} else {
 		signature, expires := o.s.GetWsSignData()
 		base := fmt.Sprintf("%v?api-expires=%v&api-signature=%v&api-key=%v", WebsocketUrl, expires, signature, o.s.Key)
-		ulog.Tracef("PreDial: %v", base)
 		return base
 	}
 }

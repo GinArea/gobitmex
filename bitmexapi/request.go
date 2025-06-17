@@ -61,11 +61,10 @@ func req[R, T any](c *Client, method string, path string, request any, transform
 	httpResponse := perf.Do()
 	if httpResponse.Error == nil {
 		r.StatusCode = httpResponse.StatusCode
-		if httpResponse.BodyExists() {
-			// && r.StatusCode != http.StatusBadGateway
-			// && r.StatusCode != http.StatusServiceUnavailable // 503 Service Unavailable
-			// && r.StatusCode != http.StatusGatewayTimeout // 504 Gateway Timeout body: {"message":"timing out", "error_id":""}
-
+		if httpResponse.BodyExists() &&
+			r.StatusCode != http.StatusBadGateway && // 502
+			r.StatusCode != http.StatusServiceUnavailable && // 503
+			r.StatusCode != http.StatusGatewayTimeout { // 504
 			resp := new(response[R])
 			r.Error = resp.parseJsonAndFillResponse(httpResponse) // If returns an error, then it is precisely a JSON decoding error.
 			if r.Ok() {

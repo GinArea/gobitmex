@@ -151,15 +151,21 @@ func (o *WsClient[T]) onMessage(messageType int, data []byte) {
 	var r T
 	err := json.Unmarshal(data, &r)
 	if err == nil {
-		if r.IsSubscription() && o.onResponse != nil {
-			err = o.onResponse(r)
-		} else if r.IsWelcome() && o.onResponse != nil {
-			err = o.onResponse(r)
+		if r.IsSubscription() {
+			if o.onResponse != nil {
+				err = o.onResponse(r)
+			}
+		} else if r.IsWelcome() {
+			if o.onResponse != nil {
+				err = o.onResponse(r)
+			}
 		} else if r.TokenExpired() {
 			if o.onResponse != nil {
 				err = o.onResponse(r)
-			} else {
-				ulog.Tracef("TokenExpired, but onResponse is nil")
+			}
+		} else if r.AlreadySubscribed() {
+			if o.onResponse != nil {
+				err = o.onResponse(r)
 			}
 		} else if o.onTopic != nil {
 			err = o.onTopic(data)

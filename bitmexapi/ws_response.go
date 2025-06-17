@@ -32,6 +32,7 @@ type WsResponse interface {
 	IsSubscription() bool
 	IsWelcome() bool
 	TokenExpired() bool
+	AlreadySubscribed() bool
 	OperationIs(string) bool
 	Ok() bool
 	Log(*ulog.Log)
@@ -57,7 +58,13 @@ type WsBaseResponse struct {
 }
 
 func (o WsBaseResponse) TokenExpired() bool {
-	return o.Status == 419
+	strError := strings.ToLower(o.Error)
+	return o.Status == 419 && strings.Contains(strError, "access token expired")
+}
+
+func (o WsBaseResponse) AlreadySubscribed() bool {
+	strError := strings.ToLower(o.Error)
+	return o.Status == 400 && strings.Contains(strError, "already subscribed")
 }
 
 func (o WsBaseResponse) IsWelcome() bool {
@@ -82,7 +89,7 @@ func (o WsBaseResponse) Log(log *ulog.Log) {
 	} else if o.Unsubscribe != "" {
 		log.Info(fmt.Sprintf("unsubscribe: %v", o.Success))
 	} else if strings.HasPrefix(o.Info, "Welcome") {
-		log.Info(fmt.Sprintf("Connected: %v", o.Success))
+		log.Info("connected successfully")
 	} else {
 		if o.Table == "" {
 			log.Errorf("unhandled response: %+v", o)
