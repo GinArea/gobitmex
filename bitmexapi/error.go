@@ -14,6 +14,23 @@ func (o *Error) Error() string {
 	return fmt.Sprintf("name[%s]: %s", o.Name, o.Message)
 }
 
+func (o *Error) KycNeed() bool {
+	lowerCasedMessage := strings.ToLower(o.Message)
+	kycNeed := false
+	if strings.Contains(lowerCasedMessage, "new traders to verify") {
+		/*
+					{
+						"error":{
+			      			"message":"We require all new traders to verify theirnidentity before their first deposit. Please visit bitmex.com/verify to complete the process.",
+			      			"name":"HTTPError"
+			   			}
+					}
+		*/
+		kycNeed = true
+	}
+	return kycNeed
+}
+
 func (o *Error) ApiKeyInvalid() bool {
 	lowerCasedMessage := strings.ToLower(o.Message)
 
@@ -26,6 +43,19 @@ func (o *Error) ApiKeyInvalid() bool {
 		invalid = true
 	} else if strings.Contains(lowerCasedMessage, "invalid use of subaccount api key") {
 		// subAccount keys
+		invalid = true
+	} else if strings.Contains(lowerCasedMessage, "signature not valid") {
+		/*
+			 // bad secret
+
+						{
+							"error":{
+				      			"message":"Signature not valid.",
+				      			"name":"HTTPError"
+				   			}
+						}
+
+		*/
 		invalid = true
 	}
 	return invalid
