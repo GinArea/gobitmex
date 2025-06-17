@@ -72,7 +72,7 @@ func (o WsBaseResponse) IsWelcome() bool {
 }
 
 func (o WsBaseResponse) IsSubscription() bool {
-	return o.Subscribe != ""
+	return o.Subscribe != "" || o.Unsubscribe != ""
 }
 
 func (o WsBaseResponse) OperationIs(v string) bool {
@@ -84,15 +84,15 @@ func (o WsBaseResponse) Ok() bool {
 }
 
 func (o WsBaseResponse) Log(log *ulog.Log) {
-	if o.Subscribe != "" {
-		log.Info(fmt.Sprintf("subscribe: %v", o.Success))
-	} else if o.Unsubscribe != "" {
-		log.Info(fmt.Sprintf("unsubscribe: %v", o.Success))
-	} else if strings.HasPrefix(o.Info, "Welcome") {
+	if o.IsSubscription() {
+		log.Info(fmt.Sprintf("(un)subscribe: %v", o.Success))
+	} else if o.IsWelcome() {
 		log.Info("connected successfully")
-	} else {
-		if o.Table == "" {
-			log.Errorf("unhandled response: %+v", o)
-		}
+	} else if o.AlreadySubscribed() {
+		log.Warning(o.Error)
+	} else if o.TokenExpired() {
+		log.Warning(o.Error)
+	} else if o.Table == "" {
+		log.Errorf("unhandled response: %+v", o)
 	}
 }
