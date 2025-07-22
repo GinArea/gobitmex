@@ -1,8 +1,12 @@
 package bitmexapi
 
 const (
-	MainBaseUrl  = "https://www.bitmex.com"
-	ApiVersion   = "api"
-	WebsocketUrl = "wss://ws.bitmex.com/realtime"
-	GinAreaTag   = "ginarea"
+	// MainBaseUrl  = "https://www.bitmex.com"
+	// WebsocketUrl = "wss://ws.bitmex.com/realtime"
+
+	MainBaseUrl  = "https://api.direct.bitmex.com"
+	WebsocketUrl = "wss://direct.bitmex.com/realtime"
+
+	ApiVersion = "api"
+	GinAreaTag = "ginarea"
 )
