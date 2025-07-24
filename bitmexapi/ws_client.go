@@ -18,7 +18,7 @@ type WsClient[T WsResponse] struct {
 
 func NewWsClient[T WsResponse]() *WsClient[T] {
 	o := new(WsClient[T])
-	o.c = uws.NewClient(WebsocketPublicUrl)
+	o.c = uws.NewClient(WebsocketUrl)
 	return o
 }
 

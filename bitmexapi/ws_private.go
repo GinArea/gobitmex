@@ -159,10 +159,10 @@ func (o *WsPrivate) Positions() *Executor[WsPositionSlice] {
 
 func (o *WsPrivate) getUrl(string) string {
 	if o.s == nil {
-		return WebsocketPrivateUrl
+		return WebsocketUrl
 	} else {
 		signature, expires := o.s.GetWsSignData()
-		base := fmt.Sprintf("%v?api-expires=%v&api-signature=%v&api-key=%v", WebsocketPrivateUrl, expires, signature, o.s.Key)
+		base := fmt.Sprintf("%v?api-expires=%v&api-signature=%v&api-key=%v", WebsocketUrl, expires, signature, o.s.Key)
 		return base
 	}
 }
