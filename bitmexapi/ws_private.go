@@ -99,7 +99,7 @@ func (o *WsPrivate) Run() {
 	o.c.WithOnDialError(func(e error) bool {
 		o.ready = false
 		er := strings.ToLower(e.Error())
-		if strings.Contains(er, "401 unauthorized") {
+		if strings.Contains(er, "401 unauthorized") || strings.Contains(er, "403 forbidden") {
 			// need to stop
 			o.c.c.Cancel()
 			return true // does not matter
