@@ -16,7 +16,7 @@ type Client struct {
 func NewClient() *Client {
 	o := new(Client)
 	o.c = uhttp.NewClient()
-	o.WithBaseUrl(MainBaseUrl)
+	o.WithBaseUrl(MainPublicBaseUrl)
 	o.WithPath(ApiVersion)
 	return o
 }
@@ -66,6 +66,7 @@ func (o *Client) WithAppendPath(path string) *Client {
 
 func (o *Client) WithAuth(key, secret string) *Client {
 	o.s = NewSign(key, secret)
+	o.WithBaseUrl(MainPrivateBaseUrl)
 	return o
 }
 
