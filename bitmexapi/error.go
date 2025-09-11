@@ -89,7 +89,8 @@ func (o *Error) Timeout() (timeout bool) {
 	lowerCasedMessage := strings.ToLower(o.Message)
 	if strings.Contains(lowerCasedMessage, "gateway timeout") ||
 		strings.Contains(lowerCasedMessage, "bad gateway") ||
-		strings.Contains(lowerCasedMessage, "system is currently overloaded") {
+		strings.Contains(lowerCasedMessage, "system is currently overloaded") ||
+		strings.Contains(lowerCasedMessage, "request timed out") {
 		timeout = true
 	}
 	return
