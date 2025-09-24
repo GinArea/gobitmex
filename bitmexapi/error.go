@@ -103,3 +103,14 @@ func (o *Error) Restricted() (restricted bool) {
 	}
 	return
 }
+
+func (o *Error) RequestExpired() (expired bool) {
+	/*
+		{"message":"This request has expired - 'expires' is in the past. Current time: 1758721150","name":"HTTPError"}
+	*/
+	lowerCasedMessage := strings.ToLower(o.Message)
+	if strings.Contains(lowerCasedMessage, "request has expired") {
+		expired = true
+	}
+	return
+}

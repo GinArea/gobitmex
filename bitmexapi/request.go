@@ -61,6 +61,9 @@ func req[R, T any](c *Client, method string, path string, request any, transform
 	httpResponse := perf.Do()
 	if httpResponse.Error == nil {
 		r.StatusCode = httpResponse.StatusCode
+		// if httpResponse.BodyExists() {
+		// 	fmt.Println(string(httpResponse.Body))
+		// }
 		if httpResponse.BodyExists() &&
 			r.StatusCode != http.StatusBadGateway && // 502
 			r.StatusCode != http.StatusServiceUnavailable && // 503
