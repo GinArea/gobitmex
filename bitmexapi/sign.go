@@ -58,8 +58,8 @@ func encodeParam(name, value string) string {
 
 func (o *Sign) header(h http.Header, data string, path string, method string) {
 
-	// expiry - use Unix time + 5 seconds
-	expires := time.Now().Unix() + 5
+	// expiry - use Unix time + 10 seconds
+	expires := time.Now().Unix() + 10
 	expiresStr := strconv.FormatInt(expires, 10)
 	url := "/" + ApiVersion + "/" + path
 	signature := GenerateSignature(o.Secret, method, url, expiresStr, data)
