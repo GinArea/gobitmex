@@ -117,3 +117,14 @@ func (o *Error) InvalidNetwork() (invalid bool) {
 	}
 	return
 }
+
+func (o *Error) UnknownCurrency() (unknown bool) {
+	/*
+		{"message":"Unknown Currency.","name":"HTTPError"}
+	*/
+	lowerCasedMessage := strings.ToLower(o.Message)
+	if strings.Contains(lowerCasedMessage, "unknown currency") {
+		unknown = true
+	}
+	return
+}
