@@ -106,3 +106,14 @@ func (o *Error) RequestExpired() (expired bool) {
 	}
 	return
 }
+
+func (o *Error) InvalidNetwork() (invalid bool) {
+	/*
+		{"message":"Invalid network.","name":"HTTPError"}
+	*/
+	lowerCasedMessage := strings.ToLower(o.Message)
+	if strings.Contains(lowerCasedMessage, "invalid network") {
+		invalid = true
+	}
+	return
+}
