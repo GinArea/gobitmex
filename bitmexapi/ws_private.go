@@ -14,8 +14,8 @@ type WsPrivate struct {
 	s              *Sign
 	ready          bool
 	onReady        func()
-	onConnected    func()
 	onDisconnected func()
+	onDialError    func(error) bool
 	subscriptions  *Subscriptions
 }
 
@@ -65,7 +65,7 @@ func (o *WsPrivate) WithOnDialDelay(f func() time.Duration) *WsPrivate {
 }
 
 func (o *WsPrivate) WithOnDialError(f func(error) bool) *WsPrivate {
-	o.c.WithOnDialError(f)
+	o.onDialError = f
 	return o
 }
 
@@ -75,7 +75,7 @@ func (o *WsPrivate) WithOnReady(f func()) *WsPrivate {
 }
 
 func (o *WsPrivate) WithOnConnected(f func()) *WsPrivate {
-	o.onConnected = f
+	o.c.WithOnConnected(f)
 	return o
 }
 
@@ -85,28 +85,24 @@ func (o *WsPrivate) WithOnDisconnected(f func()) *WsPrivate {
 }
 
 func (o *WsPrivate) Run() {
-	o.c.WithOnConnected(func() {
-		if o.onConnected != nil {
-			o.onConnected()
-		}
-	})
 	o.c.WithOnDisconnected(func() {
 		o.ready = false
 		if o.onDisconnected != nil {
 			o.onDisconnected()
 		}
 	})
-	o.c.WithOnDialError(func(e error) bool {
+	o.c.WithOnDialError(func(err error) bool {
 		o.ready = false
-		er := strings.ToLower(e.Error())
-		if strings.Contains(er, "401 unauthorized") || strings.Contains(er, "403 forbidden") {
+		s := strings.ToLower(err.Error())
+		if strings.Contains(s, "401 unauthorized") || strings.Contains(s, "403 forbidden") {
 			// need to stop
 			o.c.c.Cancel()
-			return true // does not matter
 		} else {
-			// need to retry with delay
-			return false
+			if o.onDialError != nil {
+				return o.onDialError(err)
+			}
 		}
+		return false
 	})
 	o.c.WithOnResponse(o.onResponse)
 	o.c.WithOnTopic(o.onTopic)
