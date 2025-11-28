@@ -81,15 +81,8 @@ func (o *Error) InsufficientBalance() (insufficient bool) {
 }
 
 func (o *Error) Timeout() (timeout bool) {
-
-	/*
-	   not real example, AI helped
-	*/
-
 	lowerCasedMessage := strings.ToLower(o.Message)
-	if strings.Contains(lowerCasedMessage, "gateway timeout") ||
-		strings.Contains(lowerCasedMessage, "bad gateway") ||
-		strings.Contains(lowerCasedMessage, "system is currently overloaded") {
+	if strings.Contains(lowerCasedMessage, "request timed out") { // {"error":{"message":"Request timed out","name":"HTTPError"}}
 		timeout = true
 	}
 	return
@@ -99,6 +92,39 @@ func (o *Error) Restricted() (restricted bool) {
 	lowerCasedMessage := strings.ToLower(o.Message)
 	if strings.Contains(lowerCasedMessage, "restricted") {
 		restricted = true
+	}
+	return
+}
+
+func (o *Error) RequestExpired() (expired bool) {
+	/*
+		{"message":"This request has expired - 'expires' is in the past. Current time: 1758721150","name":"HTTPError"}
+	*/
+	lowerCasedMessage := strings.ToLower(o.Message)
+	if strings.Contains(lowerCasedMessage, "request has expired") {
+		expired = true
+	}
+	return
+}
+
+func (o *Error) InvalidNetwork() (invalid bool) {
+	/*
+		{"message":"Invalid network.","name":"HTTPError"}
+	*/
+	lowerCasedMessage := strings.ToLower(o.Message)
+	if strings.Contains(lowerCasedMessage, "invalid network") {
+		invalid = true
+	}
+	return
+}
+
+func (o *Error) UnknownCurrency() (unknown bool) {
+	/*
+		{"message":"Unknown Currency.","name":"HTTPError"}
+	*/
+	lowerCasedMessage := strings.ToLower(o.Message)
+	if strings.Contains(lowerCasedMessage, "unknown currency") {
+		unknown = true
 	}
 	return
 }

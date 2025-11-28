@@ -61,18 +61,25 @@ func req[R, T any](c *Client, method string, path string, request any, transform
 	httpResponse := perf.Do()
 	if httpResponse.Error == nil {
 		r.StatusCode = httpResponse.StatusCode
+		// if httpResponse.BodyExists() {
+		// 	fmt.Println(string(httpResponse.Body))
+		// }
 		if httpResponse.BodyExists() &&
+			r.StatusCode != http.StatusInternalServerError && // 500
 			r.StatusCode != http.StatusBadGateway && // 502
 			r.StatusCode != http.StatusServiceUnavailable && // 503
-			r.StatusCode != http.StatusGatewayTimeout &&
-			/*
-				Cloudflare is a content delivery network that acts as a gateway between a user and a website server. When the 530 status code is received, it will be accompanied by a more detailed HTTP status code 1XXX error message. The errors vary in meaning and severity and are situation-dependent.
-
-				For example, Cloudflare HTTP status code 530 / Error 1016 Origin DNS Error is a case where HTTP status code 530 was returned, with the secondary HTTP status code 1016 Origin DNS Error further specified. In this very specific case, Cloudflare was unable to resolve the origin web server’s IP address due to a DNS error.
-			*/
+			r.StatusCode != http.StatusGatewayTimeout && // 504
+			r.StatusCode != 520 &&
+			r.StatusCode != 521 &&
+			r.StatusCode != 522 &&
+			r.StatusCode != 523 &&
+			r.StatusCode != 524 &&
+			r.StatusCode != 525 &&
+			r.StatusCode != 526 &&
+			r.StatusCode != 527 &&
 			r.StatusCode != 530 {
 			resp := new(response[R])
-			r.Error = resp.parseJsonAndFillResponse(httpResponse) // If returns an error, then it is precisely a JSON decoding error.
+			r.Error = resp.parseJsonAndFillResponse(httpResponse) // If that function returns an error, then it is precisely a JSON decoding error.
 			if r.Ok() {
 				r.Error = resp.Error() // here search exchange error handling
 				if r.Ok() {
