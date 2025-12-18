@@ -93,6 +93,10 @@ func (o *WsPublic) Ready() bool {
 	return o.Connected()
 }
 
+func (o *WsPublic) Reconnect() {
+	o.c.Reconnect()
+}
+
 func (o *WsPublic) subscribe(topic string) {
 	o.c.Subscribe(topic)
 }

@@ -109,6 +109,10 @@ func (o *WsClient[T]) Send(r any) {
 	o.c.SendJson(r)
 }
 
+func (o *WsClient[T]) Reconnect() {
+	o.c.Reconnect()
+}
+
 func (o *WsClient[T]) Subscribe(s string) {
 	o.SubscribeBatch([]string{s})
 }
