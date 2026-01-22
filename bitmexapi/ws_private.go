@@ -25,9 +25,6 @@ func NewWsPrivate(key, secret string) *WsPrivate {
 	o.c.c.WithOnPreDial(o.getUrl)
 	o.s = NewSign(key, secret)
 	o.subscriptions = NewSubscriptions(o)
-	o.onReady = func() {
-		o.subscriptions.subscribeAll()
-	}
 	return o
 }
 
@@ -128,6 +125,7 @@ func (o *WsPrivate) onTopic(data []byte) error {
 func (o *WsPrivate) onResponse(r WsBaseResponse) error {
 	log := o.c.Log()
 	if strings.HasPrefix(r.Info, "Welcome") {
+		o.subscriptions.subscribeAll()
 		o.ready = true
 		if o.onReady != nil {
 			o.onReady()
