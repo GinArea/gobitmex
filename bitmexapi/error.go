@@ -88,6 +88,14 @@ func (o *Error) Timeout() (timeout bool) {
 	return
 }
 
+func (o *Error) InvalidStrategy() bool {
+	lowerCasedMessage := strings.ToLower(o.Message)
+	if strings.Contains(lowerCasedMessage, "invalid strategy") { // {"error":{"message":"Invalid strategy: null","name":"HTTPError"}}
+		return true
+	}
+	return false
+}
+
 func (o *Error) Restricted() (restricted bool) {
 	lowerCasedMessage := strings.ToLower(o.Message)
 	if strings.Contains(lowerCasedMessage, "restricted") {
