@@ -84,6 +84,8 @@ func (o *Error) Timeout() (timeout bool) {
 	lowerCasedMessage := strings.ToLower(o.Message)
 	if strings.Contains(lowerCasedMessage, "request timed out") { // {"error":{"message":"Request timed out","name":"HTTPError"}}
 		timeout = true
+	} else if strings.Contains(lowerCasedMessage, "exchange suspended") { // {"error":{"message":"Exchange suspended","name":"HTTPError"}}
+		timeout = true
 	}
 	return
 }
