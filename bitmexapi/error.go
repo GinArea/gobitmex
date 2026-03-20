@@ -31,6 +31,14 @@ func (o *Error) KycNeed() bool {
 	return kycNeed
 }
 
+func (o *Error) DenialOfService() bool {
+	lowerCasedMessage := strings.ToLower(o.Message)
+	if strings.Contains(lowerCasedMessage, "your identity verification was not approved") {
+		return true
+	}
+	return false
+}
+
 func (o *Error) ApiKeyInvalid() bool {
 	lowerCasedMessage := strings.ToLower(o.Message)
 
