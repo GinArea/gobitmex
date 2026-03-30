@@ -129,6 +129,18 @@ func (o GetApiKey) Do(c *Client) Response[[]ApiKey] {
 	return Get(c, "v1/apiKey", o, identity[[]ApiKey])
 }
 
+// https://www.bitmex.com/api/explorer/#!/APIKey/APIKey_self
+
+type GetApiKeySelf struct{}
+
+func (o *Client) GetApiKeySelf() Response[ApiKey] {
+	return GetApiKeySelf{}.Do(o)
+}
+
+func (o GetApiKeySelf) Do(c *Client) Response[ApiKey] {
+	return Get(c, "v1/apiKey/self", o, identity[ApiKey])
+}
+
 // https://docs.bitmex.com/api-explorer/user-affiliates-get
 
 type UserAffiliates struct {
