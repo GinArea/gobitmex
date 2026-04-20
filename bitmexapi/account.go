@@ -91,3 +91,103 @@ func (o *Client) GetDepositAddress(currency string, network string) Response[str
 func (o GetDepositAddress) Do(c *Client) Response[string] {
 	return Get(c, "v1/user/depositAddress", o, identity[string])
 }
+
+// ReferralCodeDetails - fee discount/rebate configuration of a referral code
+type ReferralCodeDetails struct {
+	// TradingFeeDiscount - trading fee discount applied to referees (fraction, e.g. 0.2 = 20%)
+	TradingFeeDiscount float64 `json:",omitempty"`
+	// TradingFeeDiscountDuration - duration in months of the trading fee discount
+	TradingFeeDiscountDuration int `json:",omitempty"`
+	// TradingFeeRebate - trading fee rebate paid back to the referrer (fraction, e.g. 0.1 = 10%)
+	TradingFeeRebate float64 `json:",omitempty"`
+	// TradingFeeRebateDuration - duration in months of the trading fee rebate
+	TradingFeeRebateDuration int `json:",omitempty"`
+}
+
+// CreateReferralCode - request for POST /api/v1/referralCode
+// https://docs.bitmex.com/api-explorer/referral-code-create-referral-code
+// Note: request body is FLAT (fee fields at top level), even though the response
+// nests them under "details". Nesting on the request is rejected as
+// "Validation Error: data should NOT have additional properties".
+type CreateReferralCode struct {
+	// Code - the desired referral code string
+	Code string
+	// IsDefault - set true to mark this code as the account's default. Only true is accepted;
+	// false is rejected by the server as an enum-validation error, so false is omitted.
+	IsDefault bool `json:",omitempty"`
+	// IsPrimary - set true to mark this code as the account's primary. Only true is accepted;
+	// false is rejected by the server as an enum-validation error, so false is omitted.
+	IsPrimary bool `json:",omitempty"`
+	// TradingFeeDiscount - trading fee discount applied to referees (fraction, e.g. 0.2 = 20%); zero omits
+	TradingFeeDiscount float64 `json:",omitempty"`
+	// TradingFeeDiscountDuration - duration in months of the trading fee discount; zero omits
+	TradingFeeDiscountDuration int `json:",omitempty"`
+	// TradingFeeRebate - trading fee rebate paid back to the referrer (fraction, e.g. 0.1 = 10%); zero omits
+	TradingFeeRebate float64 `json:",omitempty"`
+	// TradingFeeRebateDuration - duration in months of the trading fee rebate; zero omits
+	TradingFeeRebateDuration int `json:",omitempty"`
+}
+
+// ReferralCode - response for POST /api/v1/referralCode
+// https://docs.bitmex.com/api-explorer/referral-code-create-referral-code
+type ReferralCode struct {
+	// Id - unique identifier of the referral code
+	Id string `json:"id"`
+	// UserId - identifier of the user who owns the referral code
+	UserId int `json:"userId"`
+	// Code - the referral code string
+	Code string `json:"code"`
+	// Details - fee-discount / rebate configuration of this code
+	Details ReferralCodeDetails `json:"details"`
+	// Created - timestamp when the referral code was created
+	Created time.Time `json:"created"`
+	// Modified - timestamp when the referral code was last modified
+	Modified time.Time `json:"modified"`
+	// IsDefault - whether this is the default referral code
+	IsDefault bool `json:"isDefault"`
+	// IsPrimary - whether this is the primary referral code
+	IsPrimary bool `json:"isPrimary"`
+}
+
+func (o *Client) CreateReferralCode(v CreateReferralCode) Response[ReferralCode] {
+	return v.Do(o)
+}
+
+func (o CreateReferralCode) Do(c *Client) Response[ReferralCode] {
+	return Post(c, "v1/referralCode", o, identity[ReferralCode])
+}
+
+// GetAllReferralCodes - request for GET /api/v1/referralCode
+// https://docs.bitmex.com/api-explorer/referral-code-get-all-codes-for-user
+type GetAllReferralCodes struct{}
+
+func (o *Client) GetAllReferralCodes() Response[[]ReferralCode] {
+	return GetAllReferralCodes{}.Do(o)
+}
+
+func (o GetAllReferralCodes) Do(c *Client) Response[[]ReferralCode] {
+	return Get(c, "v1/referralCode", o, identity[[]ReferralCode])
+}
+
+// DeleteReferralCode - request for DELETE /api/v1/referralCode/{id}
+// https://docs.bitmex.com/api-explorer/referral-code-delete-referral-code
+// Success response body: {"success":true}
+// Error response body:   {"error":{"message":"Not Found","name":"HTTPError"}}
+type DeleteReferralCode struct {
+	// Id - unique identifier of the referral code to delete (path parameter)
+	Id string
+}
+
+type deleteReferralCodeResponse struct {
+	Success bool `json:"success"`
+}
+
+func (o *Client) DeleteReferralCode(id string) Response[bool] {
+	return DeleteReferralCode{Id: id}.Do(o)
+}
+
+func (o DeleteReferralCode) Do(c *Client) Response[bool] {
+	return Delete(c, "v1/referralCode/"+o.Id, o, func(r deleteReferralCodeResponse) (bool, error) {
+		return r.Success, nil
+	})
+}

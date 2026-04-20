@@ -32,6 +32,11 @@ func (o *Sign) HeaderPost(h http.Header, body []byte, path string) {
 	o.header(h, string(body[:]), path, "POST")
 }
 
+func (o *Sign) HeaderDelete(h http.Header, v url.Values, path string) {
+	encodedParams := encodeSortParams(v)
+	o.header(h, encodedParams, path, "DELETE")
+}
+
 func encodeSortParams(src url.Values) (s string) {
 	if len(src) == 0 {
 		return
@@ -78,7 +83,7 @@ func (o *Sign) GetWsSignData() (signature, expires string) {
 func GenerateSignature(secret, method, path string, expiresStr string, data string) string {
 	message := method + path + expiresStr
 	if data != "" {
-		if method == "GET" {
+		if method == "GET" || method == "DELETE" {
 			message = method + path + "?" + data + expiresStr
 		} else if method == "POST" {
 			message += data
