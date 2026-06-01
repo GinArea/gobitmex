@@ -39,3 +39,11 @@ const (
 	Limit  OrderType = "Limit"
 	Market OrderType = "Market"
 )
+
+type Pool string
+
+const (
+	PoolPrimary    Pool = "Primary"
+	PoolSecondary  Pool = "Secondary"
+	PoolAggregated Pool = "Aggregated"
+)

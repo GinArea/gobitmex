@@ -8,14 +8,13 @@ import (
 )
 
 type PlaceOrder struct {
-	Symbol     string
-	Side       Side
-	OrderQty   float64 // in units of the instrument (i.e. contracts, for spot it is the base currency in minor currency (e.g. XBt quantity for XBT)).
-	ClOrdID    string
-	OrdType    OrderType
-	Type       TimeInForce `json:",omitempty"`
-	ReduceOnly *bool       `json:",omitempty"`
-	Text       string      `json:",omitempty"`
+	Symbol   string
+	Side     Side
+	OrderQty float64 // in units of the instrument (i.e. contracts, for spot it is the base currency in minor currency (e.g. XBt quantity for XBT)).
+	ClOrdID  string
+	OrdType  OrderType
+	Text     string `json:",omitempty"`
+	Pool     Pool   `json:",omitempty"`
 }
 
 type WsOrderDetailSlice []OrderDetail
@@ -50,6 +49,7 @@ type OrderDetail struct {
 	Text             string        `json:"text"`
 	TransactTime     time.Time     `json:"transactTime"`
 	Timestamp        time.Time     `json:"timestamp"`
+	Pool             string        `json:"pool"`
 
 	ClOrdLinkID     string        `json:"clOrdLinkID"`
 	Price           ujson.Float64 `json:"price"`
@@ -58,6 +58,7 @@ type OrderDetail struct {
 
 func (o *Client) PlaceOrder(v PlaceOrder) Response[OrderDetail] {
 	v.Text = GinAreaTag
+	v.Pool = PoolPrimary
 	return v.Do(o)
 }
 
