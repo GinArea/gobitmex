@@ -115,7 +115,7 @@ func (o *WsPublic) onTopic(data []byte) error {
 }
 
 func (o *WsPublic) Orderbook(symbol string) *Executor[WsOrderbookSlice] {
-	return NewExecutor[WsOrderbookSlice]("orderBookL2_25", symbol, o.subscriptions)
+	return NewExecutor[WsOrderbookSlice]("orderBookL2_25", symbol, o.subscriptions).WithSuffix("Primary")
 }
 
 func (o *WsPublic) Candles(symbol string, interval Bin) *Executor[WsCandleSlice] {
