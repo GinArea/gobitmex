@@ -44,6 +44,12 @@ func (o *WsClient[T]) WithPath(path string) *WsClient[T] {
 	return o
 }
 
+// WithBase overrides the base url (for tests against a local server)
+func (o *WsClient[T]) WithBase(base string) *WsClient[T] {
+	o.c.WithBase(base)
+	return o
+}
+
 func (o *WsClient[T]) WithProxy(proxy string) *WsClient[T] {
 	o.c.WithProxy(proxy)
 	return o
@@ -150,24 +156,13 @@ func (o *WsClient[T]) onMessage(messageType int, data []byte) {
 		return
 	}
 
-	// fmt.Printf("%s\n", data)
-
 	var r T
 	err := json.Unmarshal(data, &r)
 	if err == nil {
-		if r.IsSubscription() {
-			if o.onResponse != nil {
-				err = o.onResponse(r)
-			}
-		} else if r.IsWelcome() {
-			if o.onResponse != nil {
-				err = o.onResponse(r)
-			}
-		} else if r.TokenExpired() {
-			if o.onResponse != nil {
-				err = o.onResponse(r)
-			}
-		} else if r.AlreadySubscribed() {
+		// control responses (welcome/ack/op-command errors) must not reach processTopic:
+		// an error response has no table field, so it matches every subscription there
+		// and is lost with a meaningless "unexpected end of JSON input"
+		if r.IsCommandResponse() {
 			if o.onResponse != nil {
 				err = o.onResponse(r)
 			}

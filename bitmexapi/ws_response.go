@@ -1,6 +1,7 @@
 package bitmexapi
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -28,9 +29,13 @@ import (
 
 // {"status":503,"error":"Max Pending subscription limit reached, please try again later.","request":{"op":"subscribe","args":"orderBookL2"}}
 
+// {"status":401,"error":"User requested an account-locked subscription but no authorization was provided.","meta":{...},"request":{"op":"subscribe","args":["execution"]}}
+
 type WsResponse interface {
 	IsSubscription() bool
 	IsWelcome() bool
+	IsError() bool
+	IsCommandResponse() bool
 	TokenExpired() bool
 	AlreadySubscribed() bool
 	OperationIs(string) bool
@@ -38,11 +43,19 @@ type WsResponse interface {
 	Log(*ulog.Log)
 }
 
+// WsRequestEcho - the request echo the exchange returns in responses to op-commands.
+// Args may be either an array or a single string (see the 503 example above),
+// so it is parsed lazily via RawMessage.
+type WsRequestEcho struct {
+	Op   string          `json:"op"`
+	Args json.RawMessage `json:"args"`
+}
+
 type WsBaseResponse struct {
-	Success     bool        `json:"success"`
-	Subscribe   string      `json:"subscribe"`
-	Unsubscribe string      `json:"unsubscribe"`
-	Request     interface{} `json:"request"`
+	Success     bool          `json:"success"`
+	Subscribe   string        `json:"subscribe"`
+	Unsubscribe string        `json:"unsubscribe"`
+	Request     WsRequestEcho `json:"request"`
 
 	Status int    `json:"status"`
 	Error  string `json:"error"`
@@ -75,6 +88,33 @@ func (o WsBaseResponse) IsSubscription() bool {
 	return o.Subscribe != "" || o.Unsubscribe != ""
 }
 
+// IsError - an error response to an op-command or a server error notification
+// (e.g. 401 "no authorization was provided" on subscribe).
+func (o WsBaseResponse) IsError() bool {
+	return o.Status != 0 || o.Error != ""
+}
+
+// IsCommandResponse tells control responses (welcome/ack/errors) apart from topic data.
+// Error responses used to fall through to processTopic and were lost with an
+// "unexpected end of JSON input" - that is exactly how the lost execution/position
+// subscriptions went unnoticed (zombie connection).
+func (o WsBaseResponse) IsCommandResponse() bool {
+	return o.IsWelcome() || o.IsError() || o.Request.Op != ""
+}
+
+// RequestTopics returns the request-echo arguments: the topics of subscribe/unsubscribe.
+func (o WsBaseResponse) RequestTopics() []string {
+	var list []string
+	if json.Unmarshal(o.Request.Args, &list) == nil {
+		return list
+	}
+	var single string
+	if json.Unmarshal(o.Request.Args, &single) == nil && single != "" {
+		return []string{single}
+	}
+	return nil
+}
+
 func (o WsBaseResponse) OperationIs(v string) bool {
 	return o.Table == v
 }
@@ -92,6 +132,8 @@ func (o WsBaseResponse) Log(log *ulog.Log) {
 		log.Warning(o.Error)
 	} else if o.TokenExpired() {
 		log.Warning(o.Error)
+	} else if o.IsError() {
+		log.Errorf("error[%d] op[%s]: %s", o.Status, o.Request.Op, o.Error)
 	} else if o.Table == "" {
 		log.Errorf("unhandled response: %+v", o)
 	}

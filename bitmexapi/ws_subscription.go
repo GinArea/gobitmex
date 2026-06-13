@@ -5,23 +5,38 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 )
 
 type Subscriptions struct {
 	c     SubscriptionClient
 	mutex sync.Mutex
 	funcs SubscriptionFuncs
+	// trackPending enables ACK tracking (private ws watchdog only). The public
+	// ws leaves it false, so its subscribe path is unchanged from before the fix.
+	trackPending bool
+	pending      map[string]*pendingSubscription
+}
+
+// pendingSubscription - subscription was sent, ACK from the exchange not yet received
+type pendingSubscription struct {
+	since time.Time
+	tries int
 }
 
 func NewSubscriptions(c SubscriptionClient) *Subscriptions {
 	o := new(Subscriptions)
 	o.c = c
 	o.funcs = make(SubscriptionFuncs)
+	o.pending = make(map[string]*pendingSubscription)
 	return o
 }
 
 func (o *Subscriptions) subscribe(topic string, f SubscriptionFunc) {
 	if o.c.Ready() {
+		if o.trackPending {
+			o.markPending(topic)
+		}
 		o.c.subscribe(topic)
 	}
 	o.mutex.Lock()
@@ -36,14 +51,62 @@ func (o *Subscriptions) unsubscribe(topic string) {
 	o.mutex.Lock()
 	defer o.mutex.Unlock()
 	delete(o.funcs, topic)
+	delete(o.pending, topic)
 }
 
 func (o *Subscriptions) subscribeAll() {
 	o.mutex.Lock()
-	defer o.mutex.Unlock()
+	topics := make([]string, 0, len(o.funcs))
 	for topic := range o.funcs {
+		topics = append(topics, topic)
+		if o.trackPending {
+			o.pending[topic] = &pendingSubscription{since: time.Now()}
+		}
+	}
+	o.mutex.Unlock()
+	for _, topic := range topics {
 		o.c.subscribe(topic)
 	}
+}
+
+func (o *Subscriptions) markPending(topic string) {
+	o.mutex.Lock()
+	defer o.mutex.Unlock()
+	o.pending[topic] = &pendingSubscription{since: time.Now()}
+}
+
+// confirm clears a subscription from the ACK-waiting set
+func (o *Subscriptions) confirm(topic string) {
+	o.mutex.Lock()
+	defer o.mutex.Unlock()
+	delete(o.pending, topic)
+}
+
+func (o *Subscriptions) clearPending() {
+	o.mutex.Lock()
+	defer o.mutex.Unlock()
+	o.pending = make(map[string]*pendingSubscription)
+}
+
+// stale returns topics not confirmed within age, to be resent. exceeded=true means
+// some topic has gone unconfirmed maxTries in a row - further retries are pointless,
+// a reconnect is needed.
+func (o *Subscriptions) stale(age time.Duration, maxTries int) (retry []string, exceeded bool) {
+	o.mutex.Lock()
+	defer o.mutex.Unlock()
+	now := time.Now()
+	for topic, p := range o.pending {
+		if now.Sub(p.since) >= age {
+			if p.tries >= maxTries {
+				exceeded = true
+				return
+			}
+			p.tries++
+			p.since = now
+			retry = append(retry, topic)
+		}
+	}
+	return
 }
 
 func (o *Subscriptions) processTopic(data []byte) (err error) {
