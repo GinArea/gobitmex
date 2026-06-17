@@ -43,10 +43,11 @@ type WsPrivate struct {
 	subscriptions  *Subscriptions
 	watchdog       *app.Job
 
-	mutex       sync.Mutex
-	ready       bool      // Welcome received, subscriptions sent
-	connectedAt time.Time // when the connection was established (zero - not connected)
-	failures    int       // consecutive forced reconnects, for backoff/alert
+	mutex        sync.Mutex
+	ready        bool      // Welcome received, subscriptions sent
+	connectedAt  time.Time // when the connection was established (zero - not connected)
+	failures     int       // consecutive forced reconnects, for backoff/alert
+	reconnecting bool      // forced reconnect in flight; dedups repeat triggers (401 on both subscribes), reset on next connect
 
 	// recovery timings; set once in NewWsPrivate, treated as read-only afterwards
 	readyTimeout         time.Duration
@@ -149,6 +150,7 @@ func (o *WsPrivate) Run() {
 	o.c.WithOnConnected(func() {
 		o.mutex.Lock()
 		o.connectedAt = time.Now()
+		o.reconnecting = false // new connection established: allow it to trigger its own reconnect
 		o.mutex.Unlock()
 		if o.onConnected != nil {
 			o.onConnected()
@@ -256,6 +258,14 @@ func (o *WsPrivate) onWelcomed() {
 // streak; the streak is reset by the first confirmed subscription.
 func (o *WsPrivate) reconnect(reason error) {
 	o.mutex.Lock()
+	if o.reconnecting {
+		// a forced reconnect is already in flight for the current connection
+		// (e.g. 401 arrives on both the execution and position subscribes): count one
+		// failure, alert once, drop the socket once. Reset on the next connect.
+		o.mutex.Unlock()
+		return
+	}
+	o.reconnecting = true
 	o.ready = false
 	o.failures++
 	failures := o.failures
